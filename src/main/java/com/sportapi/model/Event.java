@@ -1,8 +1,7 @@
 package com.sportapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import org.springframework.cglib.core.Local;
-
 import java.time.LocalDate;
 
 @Entity
@@ -11,7 +10,7 @@ public class Event {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long event_id;
+    private Long id;
 
     @Column(nullable = false)
     private String eventName;
@@ -22,10 +21,12 @@ public class Event {
     @Column(nullable = false)
     private String location;
 
-    // Other columns as needed
+    @Column(name = "organization_id", nullable = false)
+    private Long organizationId;  // Added organizationId field
 
-    @ManyToOne
-    @JoinColumn(name = "organization_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @JoinColumn(name = "organization_id", insertable = false, updatable = false)
     private Organization organization;
 
     // Constructors, getters, and setters
@@ -34,21 +35,21 @@ public class Event {
         // Default constructor
     }
 
-    public Event(String eventName,String location,LocalDate eventdate) {
+    public Event(String eventName, String location, LocalDate eventDate, Long organizationId) {
         this.eventName = eventName;
-        this.location=location;
-        this.eventDate=eventdate;
+        this.location = location;
+        this.eventDate = eventDate;
+        this.organizationId = organizationId;
     }
-
 
     // Getters and setters for all fields
 
     public Long getId() {
-        return event_id;
+        return id;
     }
 
-    public void setId(Long event_id) {
-        this.event_id = event_id;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getEventName() {
@@ -59,27 +60,35 @@ public class Event {
         this.eventName = eventName;
     }
 
+    public LocalDate getEventDate() {
+        return eventDate;
+    }
+
+    public void setEventDate(LocalDate eventDate) {
+        this.eventDate = eventDate;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public Long getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(Long organizationId) {
+        this.organizationId = organizationId;
+    }
+
     public Organization getOrganization() {
         return organization;
     }
 
     public void setOrganization(Organization organization) {
         this.organization = organization;
-    }
-
-    public LocalDate getEventDate() {
-        return eventDate;
-    }
-
-    public void setEventDate(LocalDate eventDate ){
-        this.eventDate=eventDate;
-    }
-
-    public String getLocation(){
-        return location;
-    }
-
-    public  void setLocation(String location){
-        this.location=location;
     }
 }

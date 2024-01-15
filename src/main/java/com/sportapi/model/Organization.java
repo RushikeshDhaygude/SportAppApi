@@ -9,7 +9,7 @@ public class Organization {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long organization_id;
+    private Long id;
 
     @Column(nullable = false)
     private String name;
@@ -20,14 +20,10 @@ public class Organization {
     @Column(nullable = false)
     private String email;
 
-    // Other columns as needed
-
-    // One organization can have multiple events
     @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Event> events;
 
     // Constructors, getters, and setters
-
 
     public Organization() {
         // Default constructor
@@ -42,11 +38,11 @@ public class Organization {
     // Getters and setters for all fields
 
     public Long getId() {
-        return organization_id;
+        return id;
     }
 
-    public void setId(Long organization_id) {
-        this.organization_id = organization_id;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
