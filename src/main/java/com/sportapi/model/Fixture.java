@@ -1,6 +1,5 @@
 package com.sportapi.model;
 
-
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -10,11 +9,7 @@ public class Fixture {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long fixture_id;
-
-    @ManyToOne
-    @JoinColumn(name = "organization_id", nullable = false)
-    private Organization organization;
+    private Long fixtureId;
 
     @ManyToOne
     @JoinColumn(name = "event_id", nullable = false)
@@ -32,9 +27,7 @@ public class Fixture {
     private LocalDateTime dateTime;
 
     @Column(nullable = false)
-    private String gender; // You can replace this with an Enum if applicable
-
-    // Other columns as needed
+    private String gender;
 
     // Constructors, getters, and setters
 
@@ -42,8 +35,7 @@ public class Fixture {
         // Default constructor
     }
 
-    public Fixture(Organization organization, Event event, Teams team1, Teams team2, LocalDateTime dateTime, String gender) {
-        this.organization = organization;
+    public Fixture(Event event, Teams team1, Teams team2, LocalDateTime dateTime, String gender) {
         this.event = event;
         this.team1 = team1;
         this.team2 = team2;
@@ -51,22 +43,17 @@ public class Fixture {
         this.gender = gender;
     }
 
+//    public Fixture(Organization organization, Event event, Teams team1, Teams team2, LocalDateTime dateTime, String gender) {
+//    }
+
     // Getters and setters for all fields
 
     public Long getId() {
-        return fixture_id;
+        return fixtureId;
     }
 
-    public void setId(Long fixture_id) {
-        this.fixture_id = fixture_id;
-    }
-
-    public Organization getOrganization() {
-        return organization;
-    }
-
-    public void setOrganization(Organization organization) {
-        this.organization = organization;
+    public void setId(Long fixtureid) {
+        this.fixtureId = fixtureId;
     }
 
     public Event getEvent() {

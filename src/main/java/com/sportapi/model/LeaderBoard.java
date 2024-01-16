@@ -10,10 +10,6 @@ public class LeaderBoard {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Additional association with Organization
-    @ManyToOne
-    @JoinColumn(name = "organization_id", nullable = false)
-    private Organization organization;
 
     @ManyToOne
     @JoinColumn(name = "event_id", nullable = false)
@@ -43,8 +39,7 @@ public class LeaderBoard {
         // Default constructor
     }
 
-    public LeaderBoard(Event event, Organization organization, Teams team, int matchesPlayed, int won, int lost, int totalPoints) {
-        this.organization = organization;
+    public LeaderBoard(Event event, Teams team, int matchesPlayed, int won, int lost, int totalPoints) {
         this.event = event;
         this.team = team;
         this.matchesPlayed = matchesPlayed;
@@ -111,11 +106,4 @@ public class LeaderBoard {
         this.totalPoints = totalPoints;
     }
 
-    public Organization getOrganization() {
-        return organization;
-    }
-
-    public void setOrganization(Organization organization) {
-        this.organization = organization;
-    }
 }

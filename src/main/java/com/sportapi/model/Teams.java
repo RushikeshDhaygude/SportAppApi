@@ -15,9 +15,8 @@ public class Teams{
     @Column(nullable = false)
     private String teamName;
 
-    @Lob
     @Column
-    private byte[] teamLogo;
+    private String teamLogoPath;
 
     @Column(nullable = false)
     private String teamCaptain;
@@ -31,9 +30,9 @@ public class Teams{
         // Default constructor
     }
 
-    public Teams(String teamName, byte[] teamLogo, String teamCaptain, String teamCaptainContact) {
+    public Teams(String teamName, String teamLogoPath, String teamCaptain, String teamCaptainContact) {
         this.teamName = teamName;
-        this.teamLogo = teamLogo;
+        this.teamLogoPath = teamLogoPath;
         this.teamCaptain = teamCaptain;
         this.teamCaptainContact = teamCaptainContact;
     }
@@ -45,6 +44,7 @@ public class Teams{
     }
 
     public void setId(Long id) {
+
         this.id = id;
     }
 
@@ -56,12 +56,12 @@ public class Teams{
         this.teamName = teamName;
     }
 
-    public byte[] getTeamLogo() {
-        return teamLogo;
+    public String getTeamLogoPath() {
+        return teamLogoPath;
     }
 
-    public void setTeamLogo(byte[] teamLogo) {
-        this.teamLogo = teamLogo;
+    public void setTeamLogoPath(String teamLogoPath) {
+        this.teamLogoPath = teamLogoPath;
     }
 
     public String getTeamCaptain() {
