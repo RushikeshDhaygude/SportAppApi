@@ -3,6 +3,7 @@ package com.sportapi.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "events")
@@ -20,6 +21,11 @@ public class Event {
 
     @Column(nullable = false)
     private String location;
+
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
+    private List<Pool> pools;
 
     @Column(name = "organization_id", nullable = false)
     private Long organizationId;  // Added organizationId field
@@ -91,4 +97,13 @@ public class Event {
     public void setOrganization(Organization organization) {
         this.organization = organization;
     }
+
+    public List<Pool> getPools() {
+        return pools;
+    }
+
+    public void setPools(List<Pool> pools) {
+        this.pools = pools;
+    }
+
 }

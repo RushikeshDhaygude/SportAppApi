@@ -1,5 +1,7 @@
 package com.sportapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -17,10 +19,12 @@ public class Fixture {
 
     @ManyToOne
     @JoinColumn(name = "team1_id", nullable = false)
+    @JsonIgnoreProperties("fixtures") // Ignore the 'fixtures' property in Teams class during serialization
     private Teams team1;
 
     @ManyToOne
     @JoinColumn(name = "team2_id", nullable = false)
+    @JsonIgnoreProperties("fixtures") // Ignore the 'fixtures' property in Teams class during serialization
     private Teams team2;
 
     @Column(nullable = false)
@@ -29,11 +33,18 @@ public class Fixture {
     @Column(nullable = false)
     private String gender;
 
-    // Constructors, getters, and setters
+    public  Fixture()
+    {
 
-    public Fixture() {
-        // Default constructor
     }
+//    public Fixture(Long fixtureId, Event event, Teams team1, Teams team2, LocalDateTime dateTime, String gender) {
+//        this.fixtureId = fixtureId;
+//        this.event = event;
+//        this.team1 = team1;
+//        this.team2 = team2;
+//        this.dateTime = dateTime;
+//        this.gender = gender;
+//    }
 
     public Fixture(Event event, Teams team1, Teams team2, LocalDateTime dateTime, String gender) {
         this.event = event;
@@ -43,16 +54,11 @@ public class Fixture {
         this.gender = gender;
     }
 
-//    public Fixture(Organization organization, Event event, Teams team1, Teams team2, LocalDateTime dateTime, String gender) {
-//    }
-
-    // Getters and setters for all fields
-
-    public Long getId() {
+    public Long getFixtureId() {
         return fixtureId;
     }
 
-    public void setId(Long fixtureid) {
+    public void setFixtureId(Long fixtureId) {
         this.fixtureId = fixtureId;
     }
 
@@ -95,4 +101,7 @@ public class Fixture {
     public void setGender(String gender) {
         this.gender = gender;
     }
+
+
+// Other methods...
 }

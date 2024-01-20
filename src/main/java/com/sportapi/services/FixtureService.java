@@ -1,18 +1,31 @@
 package com.sportapi.services;
 
 import com.sportapi.model.DTO.FixtureDTO;
+import com.sportapi.model.Fixture;
+import com.sportapi.model.Teams;
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 
 public interface FixtureService {
+    List<Fixture> getAllFixtures();
 
-    List<FixtureDTO> getAllFixtures();
+    Fixture getFixtureById(Long fixtureId);
 
-    FixtureDTO getFixtureById(Long id);
+    Fixture createFixture(FixtureDTO fixtureDTO);
 
-    void createFixture(FixtureDTO fixtureDTO);
+    Fixture updateFixture(Long fixtureId, FixtureDTO fixtureDTO);
 
-    void updateFixture(Long id, FixtureDTO fixtureDTO);
+    void deleteFixture(Long fixtureId);
 
-    void deleteFixture(Long id);
+    @Transactional
+    List<Teams> getTeamsForFixture(Long fixtureId);
+
+    @Transactional
+    void addTeamToFixture(Long fixtureId, Long teamId);
+
+    @Transactional
+    void removeTeamFromFixture(Long fixtureId, Long teamId);
+
+    // Other methods...
 }

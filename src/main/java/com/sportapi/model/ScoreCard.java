@@ -11,7 +11,7 @@ public class ScoreCard {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "organization_id", nullable = false)
+    @JoinColumn(name = "organization_id", nullable = true)
     private Organization organization;
 
     @ManyToOne

@@ -1,7 +1,11 @@
 package com.sportapi.controllers;
 
 import com.sportapi.model.Event;
+import com.sportapi.model.Pool;
+import com.sportapi.repositories.EventRepository;
+import com.sportapi.repositories.PoolRepository;
 import com.sportapi.services.EventService;
+import com.sportapi.services.PoolService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +18,17 @@ import java.util.List;
 public class EventController {
 
     private final EventService eventService;
+
+    @Autowired
+    private PoolService poolService;
+
+    @Autowired
+    private EventRepository eventRepository;
+
+    @Autowired
+    private PoolRepository poolRepository;
+
+
 
     @Autowired
     public EventController(EventService eventService) {
@@ -60,4 +75,21 @@ public class EventController {
         eventService.deleteEvent(eventId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+//    @PostMapping("/createPool")
+//    public Pool createPool(@RequestBody Pool pool) {
+//        return poolService.createPool(pool);
+//    }
+//
+//
+//    @PostMapping("/{eventId}/pools/{poolId}")
+//    public void addPoolToEvent(@PathVariable Long eventId, @PathVariable Long poolId) {
+//        eventService.addPoolToEvent(eventId, poolId);
+//    }
+//
+//    @GetMapping("/{eventId}/pools")
+//    public List<Pool> getPoolsForEvent(@PathVariable Long eventId) {
+//        return eventService.getPoolsForEvent(eventId);
+//    }
+
 }

@@ -15,10 +15,8 @@ public class Gallery {
     private Organization organization;
 
     @Lob
-    @Column(nullable = false)
-    private byte[] image;
-
-    // Other columns as needed
+    @Column
+    private String imagePath;
 
     // Constructors, getters, and setters
 
@@ -26,12 +24,10 @@ public class Gallery {
         // Default constructor
     }
 
-    public Gallery(Organization organization, byte[] image) {
+    public Gallery(Organization organization, String imagePath) {
         this.organization = organization;
-        this.image = image;
+        this.imagePath = imagePath;
     }
-
-    // Getters and setters for all fields
 
     public Long getId() {
         return id;
@@ -49,11 +45,11 @@ public class Gallery {
         this.organization = organization;
     }
 
-    public byte[] getImage() {
-        return image;
+    public String getImagePath() {
+        return imagePath;
     }
 
-    public void setImage(byte[] image) {
-        this.image = image;
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 }

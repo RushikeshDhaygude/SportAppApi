@@ -1,7 +1,9 @@
 package com.sportapi.services.Impl;
 
 import com.sportapi.model.Event;
+import com.sportapi.model.Pool;
 import com.sportapi.repositories.EventRepository;
+import com.sportapi.repositories.PoolRepository;
 import com.sportapi.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,9 @@ import java.util.Optional;
 public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
+
+    @Autowired
+    private PoolRepository poolRepository;
 
     @Autowired
     public EventServiceImpl(EventRepository eventRepository) {
@@ -55,4 +60,22 @@ public class EventServiceImpl implements EventService {
     public void deleteEvent(Long eventId) {
         eventRepository.deleteById(eventId);
     }
+
+    public void addPoolToEvent(Long eventId, Long poolId) {
+        Event event = eventRepository.findById(eventId).orElse(null);
+        Pool pool = poolRepository.findById(poolId).orElse(null);
+
+        if (event != null && pool != null) {
+            event.getPools().add(pool);
+            eventRepository.save(event);
+        }
+    }
+
+    @Override
+    public List<Pool> getPoolsForEvent(Long eventId) {
+        Event event = eventRepository.findById(eventId).orElse(null);
+        return event != null ? event.getPools() : null;
+    }
+
+
 }
