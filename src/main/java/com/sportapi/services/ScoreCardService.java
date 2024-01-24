@@ -3,18 +3,15 @@ package com.sportapi.services;
 import com.sportapi.model.ScoreCard;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ScoreCardService {
 
-    ScoreCard createScoreCard(ScoreCard scoreCard);
-
-    ScoreCard getScoreCardById(Long scoreCardId);
-
     List<ScoreCard> getAllScoreCards();
 
-    ScoreCard updateScoreCard(ScoreCard scoreCard);
+    Optional<ScoreCard> getScoreCardById(Long id);
 
-    boolean deleteScoreCard(Long scoreCardId);
+    ScoreCard saveScoreCard(ScoreCard scoreCard);
 
-    // Add other service methods as needed
+    void deleteScoreCard(Long id);
 }

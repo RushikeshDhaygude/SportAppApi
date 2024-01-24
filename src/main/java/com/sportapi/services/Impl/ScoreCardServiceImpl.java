@@ -16,34 +16,23 @@ public class ScoreCardServiceImpl implements ScoreCardService {
     private ScoreCardRepository scoreCardRepository;
 
     @Override
-    public ScoreCard createScoreCard(ScoreCard scoreCard) {
-        return scoreCardRepository.save(scoreCard);
-    }
-
-    @Override
-    public ScoreCard getScoreCardById(Long scoreCardId) {
-        Optional<ScoreCard> optionalScoreCard = scoreCardRepository.findById(scoreCardId);
-        return optionalScoreCard.orElse(null);
-    }
-
-    @Override
     public List<ScoreCard> getAllScoreCards() {
         return scoreCardRepository.findAll();
     }
 
     @Override
-    public ScoreCard updateScoreCard(ScoreCard scoreCard) {
+    public Optional<ScoreCard> getScoreCardById(Long id) {
+        return scoreCardRepository.findById(id);
+    }
+
+    @Override
+    public ScoreCard saveScoreCard(ScoreCard scoreCard) {
+        // Additional logic if needed
         return scoreCardRepository.save(scoreCard);
     }
 
     @Override
-    public boolean deleteScoreCard(Long scoreCardId) {
-        if (scoreCardRepository.existsById(scoreCardId)) {
-            scoreCardRepository.deleteById(scoreCardId);
-            return true;
-        }
-        return false;
+    public void deleteScoreCard(Long id) {
+        scoreCardRepository.deleteById(id);
     }
-
-    // Add other service methods as needed
 }

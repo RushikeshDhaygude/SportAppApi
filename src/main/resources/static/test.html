@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Client</title>
+    <!-- SockJS and Stomp libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+
+<h1>WebSocket Client</h1>
+
+<div id="score-updates">
+    <!-- Score updates will be displayed here -->
+</div>
+
+<script>
+    // Connect to WebSocket endpoint
+    const socket = new SockJS('http://localhost:8080/ws');
+    const stompClient = Stomp.over(socket);
+
+    // Connect to WebSocket broker
+    stompClient.connect({}, function (frame) {
+        console.log('Connected to WebSocket');
+
+        // Subscribe to the "/topic/score-updates" destination
+        stompClient.subscribe('/topic/score-updates', function (scoreUpdate) {
+            const scoreCard = JSON.parse(scoreUpdate.body);
+            displayScoreUpdate(scoreCard);
+        });
+    });
+
+    function displayScoreUpdate(scoreCard) {
+        const scoreUpdatesDiv = document.getElementById('score-updates');
+
+        // Check if team1 and team2 properties exist before accessing their nested properties
+        if (scoreCard.team1 && scoreCard.team2) {
+            const updateMessage = `Score Updated: ${scoreCard.team1.teamName} - ${scoreCard.team1Score} vs ${scoreCard.team2.teamName} - ${scoreCard.team2Score}`;
+
+            const updateNode = document.createElement('p');
+            updateNode.appendChild(document.createTextNode(updateMessage));
+
+            scoreUpdatesDiv.appendChild(updateNode);
+        }
+    }
+</script>
+
+</body>
+</html>
