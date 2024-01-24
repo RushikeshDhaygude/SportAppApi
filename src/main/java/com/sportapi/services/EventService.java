@@ -17,5 +17,7 @@ public interface EventService {
 
     void deleteEvent(Long eventId);
 
+    void addPoolToEvent(Long eventId, Long poolId);
+
     List<Pool> getPoolsForEvent(Long eventId);
 }

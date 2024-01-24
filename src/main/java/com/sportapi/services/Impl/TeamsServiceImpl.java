@@ -29,52 +29,82 @@ public class TeamsServiceImpl implements TeamsService {
 
     @Override
     public List<Teams> getAllTeams() {
-        return teamsRepository.findAll();
+        try {
+            return teamsRepository.findAll();
+        } catch (Exception e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
+            throw new RuntimeException("Error getting all teams", e);
+        }
     }
 
     @Override
     public Teams getTeamById(Long id) {
-        return teamsRepository.findById(id).orElse(null);
+        try {
+            return teamsRepository.findById(id).orElse(null);
+        } catch (Exception e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
+            throw new RuntimeException("Error getting team by ID", e);
+        }
     }
 
     @Override
     @Transactional
     public void createTeam(String teamName, MultipartFile teamLogo, String teamCaptain, String teamCaptainContact) {
-        Teams team = new Teams();
-        team.setTeamName(teamName);
-        team.setTeamCaptain(teamCaptain);
-        team.setTeamCaptainContact(teamCaptainContact);
+        try {
+            Teams team = new Teams();
+            team.setTeamName(teamName);
+            team.setTeamCaptain(teamCaptain);
+            team.setTeamCaptainContact(teamCaptainContact);
 
-        if (teamLogo != null && !teamLogo.isEmpty()) {
-            String logoPath = fileUploadService.uploadFile(teamLogo, "images/team-logos");
-            team.setTeamLogoPath(logoPath);
+            if (teamLogo != null && !teamLogo.isEmpty()) {
+                String logoPath = fileUploadService.uploadFile(teamLogo, "images/team-logos");
+                team.setTeamLogoPath(logoPath);
+            }
+
+            teamsRepository.save(team);
+        } catch (Exception e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
+            throw new RuntimeException("Error creating team", e);
         }
-
-        teamsRepository.save(team);
     }
 
     @Override
     @Transactional
     public void updateTeam(Long id, String teamName, MultipartFile teamLogo, String teamCaptain, String teamCaptainContact) {
-        Teams existingTeam = teamsRepository.findById(id).orElse(null);
+        try {
+            Teams existingTeam = teamsRepository.findById(id).orElse(null);
 
-        if (existingTeam != null) {
-            existingTeam.setTeamName(teamName);
-            existingTeam.setTeamCaptain(teamCaptain);
-            existingTeam.setTeamCaptainContact(teamCaptainContact);
+            if (existingTeam != null) {
+                existingTeam.setTeamName(teamName);
+                existingTeam.setTeamCaptain(teamCaptain);
+                existingTeam.setTeamCaptainContact(teamCaptainContact);
 
-            if (teamLogo != null && !teamLogo.isEmpty()) {
-                String logoPath = fileUploadService.uploadFile(teamLogo, "images/team-logos");
-                existingTeam.setTeamLogoPath(logoPath);
+                if (teamLogo != null && !teamLogo.isEmpty()) {
+                    String logoPath = fileUploadService.uploadFile(teamLogo, "images/team-logos");
+                    existingTeam.setTeamLogoPath(logoPath);
+                }
+
+                teamsRepository.save(existingTeam);
             }
-
-            teamsRepository.save(existingTeam);
+        } catch (Exception e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
+            throw new RuntimeException("Error updating team", e);
         }
     }
 
     @Override
     @Transactional
     public void deleteTeam(Long id) {
-        teamsRepository.deleteById(id);
+        try {
+            teamsRepository.deleteById(id);
+        } catch (Exception e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
+            throw new RuntimeException("Error deleting team", e);
+        }
     }
 }

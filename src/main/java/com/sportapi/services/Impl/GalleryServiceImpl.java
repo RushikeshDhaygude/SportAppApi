@@ -4,6 +4,8 @@ import com.sportapi.model.Gallery;
 import com.sportapi.repositories.GalleryRepository;
 import com.sportapi.services.Impl.FileUploadService;
 import com.sportapi.services.GalleryService;
+import jakarta.persistence.EntityNotFoundException;
+import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,45 +27,82 @@ public class GalleryServiceImpl implements GalleryService {
 
     @Override
     public List<Gallery> getAllGalleries() {
-        return galleryRepository.findAll();
+        try {
+            return galleryRepository.findAll();
+        } catch (Exception e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
+            throw new ServiceException("Error getting all galleries", e);
+        }
     }
 
     @Override
     public Gallery getGalleryById(Long id) {
-        return galleryRepository.findById(id).orElse(null);
+        try {
+            return galleryRepository.findById(id).orElse(null);
+        } catch (Exception e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
+            throw new ServiceException("Error getting gallery by ID: " + id, e);
+        }
     }
 
     @Override
     public Gallery createGallery(Gallery gallery) {
-        return galleryRepository.save(gallery);
+        try {
+            return galleryRepository.save(gallery);
+        } catch (Exception e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
+            throw new ServiceException("Error creating gallery", e);
+        }
     }
 
     @Override
     public Gallery updateGallery(Gallery gallery) {
-        return galleryRepository.save(gallery);
+        try {
+            return galleryRepository.save(gallery);
+        } catch (Exception e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
+            throw new ServiceException("Error updating gallery", e);
+        }
     }
 
     @Override
     public boolean deleteGallery(Long id) {
-        if (galleryRepository.existsById(id)) {
-            galleryRepository.deleteById(id);
-            return true;
+        try {
+            if (galleryRepository.existsById(id)) {
+                galleryRepository.deleteById(id);
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
+            throw new ServiceException("Error deleting gallery with ID: " + id, e);
         }
-        return false;
     }
 
     @Override
     public void uploadImage(Long galleryId, MultipartFile file) {
-        Gallery gallery = galleryRepository.findById(galleryId).orElse(null);
+        try {
+            Gallery gallery = galleryRepository.findById(galleryId)
+                    .orElseThrow(() -> new EntityNotFoundException("Gallery not found with ID: " + galleryId));
 
-        if (gallery != null) {
-            try {
-                String imagePath = fileUploadService.uploadFile(file, "images/galleries");
-                gallery.setImagePath(imagePath);
-                galleryRepository.save(gallery);
-            } catch (Exception e) {
-                e.printStackTrace(); // Handle exception as needed
-            }
+            String imagePath = fileUploadService.uploadFile(file, "images/galleries");
+            gallery.setImagePath(imagePath);
+            galleryRepository.save(gallery);
+
+        } catch (EntityNotFoundException e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
+            throw e;
+
+        } catch (Exception e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
+            throw new ServiceException("Unexpected error in uploadImage for Gallery ID: " + galleryId, e);
         }
     }
 }

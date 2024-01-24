@@ -20,41 +20,48 @@ public class EventController {
     private final EventService eventService;
 
     @Autowired
-    private PoolService poolService;
-
-    @Autowired
-    private EventRepository eventRepository;
-
-    @Autowired
-    private PoolRepository poolRepository;
-
-
-
-    @Autowired
     public EventController(EventService eventService) {
         this.eventService = eventService;
     }
 
     @GetMapping
     public ResponseEntity<List<Event>> getAllEvents() {
-        List<Event> events = eventService.getAllEvents();
-        return new ResponseEntity<>(events, HttpStatus.OK);
+        try {
+            List<Event> events = eventService.getAllEvents();
+            return new ResponseEntity<>(events, HttpStatus.OK);
+        } catch (Exception e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Event> getEventById(@PathVariable("id") Long eventId) {
-        Event event = eventService.getEventById(eventId);
-        if (event != null) {
-            return new ResponseEntity<>(event, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            Event event = eventService.getEventById(eventId);
+            if (event != null) {
+                return new ResponseEntity<>(event, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping
     public ResponseEntity<Event> createEvent(@RequestBody Event event) {
-        Event createdEvent = eventService.createEvent(event);
-        return new ResponseEntity<>(createdEvent, HttpStatus.CREATED);
+        try {
+            Event createdEvent = eventService.createEvent(event);
+            return new ResponseEntity<>(createdEvent, HttpStatus.CREATED);
+        } catch (Exception e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PutMapping("/{id}")
@@ -62,34 +69,29 @@ public class EventController {
             @PathVariable("id") Long eventId,
             @RequestBody Event updatedEvent
     ) {
-        Event event = eventService.updateEvent(eventId, updatedEvent);
-        if (event != null) {
-            return new ResponseEntity<>(event, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            Event event = eventService.updateEvent(eventId, updatedEvent);
+            if (event != null) {
+                return new ResponseEntity<>(event, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEvent(@PathVariable("id") Long eventId) {
-        eventService.deleteEvent(eventId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        try {
+            eventService.deleteEvent(eventId);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
-
-//    @PostMapping("/createPool")
-//    public Pool createPool(@RequestBody Pool pool) {
-//        return poolService.createPool(pool);
-//    }
-//
-//
-//    @PostMapping("/{eventId}/pools/{poolId}")
-//    public void addPoolToEvent(@PathVariable Long eventId, @PathVariable Long poolId) {
-//        eventService.addPoolToEvent(eventId, poolId);
-//    }
-//
-//    @GetMapping("/{eventId}/pools")
-//    public List<Pool> getPoolsForEvent(@PathVariable Long eventId) {
-//        return eventService.getPoolsForEvent(eventId);
-//    }
-
 }

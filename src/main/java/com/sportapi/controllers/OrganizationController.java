@@ -22,24 +22,42 @@ public class OrganizationController {
 
     @GetMapping
     public ResponseEntity<List<Organization>> getAllOrganizations() {
-        List<Organization> organizations = organizationService.getAllOrganizations();
-        return new ResponseEntity<>(organizations, HttpStatus.OK);
+        try {
+            List<Organization> organizations = organizationService.getAllOrganizations();
+            return new ResponseEntity<>(organizations, HttpStatus.OK);
+        } catch (Exception e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Organization> getOrganizationById(@PathVariable("id") Long organizationId) {
-        Organization organization = organizationService.getOrganizationById(organizationId);
-        if (organization != null) {
-            return new ResponseEntity<>(organization, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            Organization organization = organizationService.getOrganizationById(organizationId);
+            if (organization != null) {
+                return new ResponseEntity<>(organization, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping
     public ResponseEntity<Organization> createOrganization(@RequestBody Organization organization) {
-        Organization createdOrganization = organizationService.createOrganization(organization);
-        return new ResponseEntity<>(createdOrganization, HttpStatus.CREATED);
+        try {
+            Organization createdOrganization = organizationService.createOrganization(organization);
+            return new ResponseEntity<>(createdOrganization, HttpStatus.CREATED);
+        } catch (Exception e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PutMapping("/{id}")
@@ -47,17 +65,29 @@ public class OrganizationController {
             @PathVariable("id") Long organizationId,
             @RequestBody Organization updatedOrganization
     ) {
-        Organization organization = organizationService.updateOrganization(organizationId, updatedOrganization);
-        if (organization != null) {
-            return new ResponseEntity<>(organization, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            Organization organization = organizationService.updateOrganization(organizationId, updatedOrganization);
+            if (organization != null) {
+                return new ResponseEntity<>(organization, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOrganization(@PathVariable("id") Long organizationId) {
-        organizationService.deleteOrganization(organizationId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        try {
+            organizationService.deleteOrganization(organizationId);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

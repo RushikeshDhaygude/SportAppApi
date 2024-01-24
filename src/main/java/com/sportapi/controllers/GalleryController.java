@@ -34,46 +34,58 @@ public class GalleryController {
 
     @GetMapping
     public ResponseEntity<List<Gallery>> getAllGalleries() {
-        List<Gallery> galleries = galleryService.getAllGalleries();
-        return new ResponseEntity<>(galleries, HttpStatus.OK);
+        try {
+            List<Gallery> galleries = galleryService.getAllGalleries();
+            return new ResponseEntity<>(galleries, HttpStatus.OK);
+        } catch (Exception e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Gallery> getGalleryById(@PathVariable Long id) {
-        Gallery gallery = galleryService.getGalleryById(id);
-        if (gallery != null) {
-            return new ResponseEntity<>(gallery, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            Gallery gallery = galleryService.getGalleryById(id);
+            if (gallery != null) {
+                return new ResponseEntity<>(gallery, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    // ... (other methods)
 
     @PostMapping
     public ResponseEntity<Gallery> createGallery(
             @RequestParam("organizationId") Long organizationId,
             @RequestPart("file") MultipartFile file) {
 
-        Organization organization = organizationService.getOrganizationById(organizationId);
-
-        if (organization == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        Gallery gallery = new Gallery();
-        gallery.setOrganization(organization);
-
         try {
+            Organization organization = organizationService.getOrganizationById(organizationId);
+
+            if (organization == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            Gallery gallery = new Gallery();
+            gallery.setOrganization(organization);
+
             String imagePath = fileUploadService.uploadFile(file, "images/galleries");
             gallery.setImagePath(imagePath);
+
+            Gallery createdGallery = galleryService.createGallery(gallery);
+
+            return new ResponseEntity<>(createdGallery, HttpStatus.CREATED);
         } catch (Exception e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        Gallery createdGallery = galleryService.createGallery(gallery);
-
-        return new ResponseEntity<>(createdGallery, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
@@ -82,44 +94,50 @@ public class GalleryController {
             @RequestParam("organizationId") Long organizationId,
             @RequestPart(value = "file", required = false) MultipartFile file) {
 
-        Organization organization = organizationService.getOrganizationById(organizationId);
+        try {
+            Organization organization = organizationService.getOrganizationById(organizationId);
 
-        if (organization == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        Gallery existingGallery = galleryService.getGalleryById(id);
-
-        if (existingGallery != null) {
-            // Update the existing gallery properties
-            existingGallery.setOrganization(organization);
-
-            if (file != null && !file.isEmpty()) {
-                try {
-                    String imagePath = fileUploadService.uploadFile(file, "images/galleries");
-                    existingGallery.setImagePath(imagePath);
-                } catch (Exception e) {
-                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-                }
+            if (organization == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 
-            // Save the updated gallery
-            Gallery updatedGalleryResult = galleryService.updateGallery(existingGallery);
+            Gallery existingGallery = galleryService.getGalleryById(id);
 
-            return new ResponseEntity<>(updatedGalleryResult, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            if (existingGallery != null) {
+                // Update the existing gallery properties
+                existingGallery.setOrganization(organization);
+
+                if (file != null && !file.isEmpty()) {
+                    String imagePath = fileUploadService.uploadFile(file, "images/galleries");
+                    existingGallery.setImagePath(imagePath);
+                }
+
+                // Save the updated gallery
+                Gallery updatedGalleryResult = galleryService.updateGallery(existingGallery);
+
+                return new ResponseEntity<>(updatedGalleryResult, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteGallery(@PathVariable Long id) {
-        if (galleryService.deleteGallery(id)) {
-            return new ResponseEntity<>("Gallery deleted successfully", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Gallery not found", HttpStatus.NOT_FOUND);
+        try {
+            if (galleryService.deleteGallery(id)) {
+                return new ResponseEntity<>("Gallery deleted successfully", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Gallery not found", HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
+            return new ResponseEntity<>("Error deleting gallery", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    // ... (other methods)
 }
