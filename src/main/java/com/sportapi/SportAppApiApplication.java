@@ -10,4 +10,9 @@ public class SportAppApiApplication {
 		SpringApplication.run(SportAppApiApplication.class, args);
 	}
 }
+// Zookeper
+//.\bin\windows\zookeeper-server-start.bat .\config\zookeeper.properties
+
+//Kafka
+//.\bin\windows\kafka-server-start.bat .\config\server.properties
 
