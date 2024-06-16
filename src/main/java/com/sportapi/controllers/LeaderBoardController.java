@@ -1,6 +1,7 @@
 package com.sportapi.controllers;
 
-import com.sportapi.model.LeaderBoard;
+import com.sportapi.model.DTO.AddLeaderboardRecordsDTO;
+import com.sportapi.model.DTO.LeaderboardDTO;
 import com.sportapi.services.LeaderBoardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -8,34 +9,33 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/leaderboards")
+@RequestMapping("/api/leaderboard")
 public class LeaderBoardController {
-
     @Autowired
-    private LeaderBoardService leaderBoardService;
+    private LeaderBoardService leaderboardService;
 
     @GetMapping
-    public List<LeaderBoard> getAllLeaderBoards() {
-        return leaderBoardService.getLeaderBoards();
+    public List<LeaderboardDTO> getAllLeaderboardRecords() {
+        return leaderboardService.getAllLeaderboardRecords();
     }
 
-    @GetMapping("/{id}")
-    public LeaderBoard getLeaderBoardById(@PathVariable Long id) {
-        return leaderBoardService.getLeaderBoardById(id);
+    @GetMapping("/{eventId}")
+    public List<LeaderboardDTO> getLeaderboardByEvent(@PathVariable Long eventId) {
+        return leaderboardService.getLeaderboardByEvent(eventId);
     }
 
     @PostMapping
-    public LeaderBoard createLeaderBoard(@RequestBody LeaderBoard leaderBoard) {
-        return leaderBoardService.createLeaderBoard(leaderBoard);
-    }
-
-    @PutMapping("/{id}")
-    public LeaderBoard updateLeaderBoard(@PathVariable Long id, @RequestBody LeaderBoard leaderBoard) {
-        return leaderBoardService.updateLeaderBoard(id, leaderBoard);
+    public void addLeaderboardRecords(@RequestBody List<AddLeaderboardRecordsDTO> recordsDTO) {
+        leaderboardService.addLeaderboardRecords(recordsDTO);
     }
 
     @DeleteMapping("/{id}")
-    public boolean deleteLeaderBoard(@PathVariable Long id) {
-        return leaderBoardService.deleteLeaderBoard(id);
+    public void deleteLeaderboardRecord(@PathVariable Long id) {
+        leaderboardService.deleteLeaderboardRecord(id);
+    }
+
+    @PutMapping("/{id}")
+    public LeaderboardDTO updateLeaderboardRecord(@PathVariable Long id, @RequestBody AddLeaderboardRecordsDTO updateDTO) {
+        return leaderboardService.updateLeaderboardRecord(id, updateDTO);
     }
 }

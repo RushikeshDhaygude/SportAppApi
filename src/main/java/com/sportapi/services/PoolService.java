@@ -7,7 +7,7 @@ import com.sportapi.model.Teams;
 import java.util.List;
 
 public interface PoolService {
-    Pool createPool(PoolRequest poolRequest);
+//    Pool createPool(PoolRequest poolRequest);
     List<Pool> getAllPools();
 
     Pool createPool(PoolDTO poolDTO);

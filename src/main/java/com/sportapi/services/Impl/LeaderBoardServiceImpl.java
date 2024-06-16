@@ -1,54 +1,75 @@
 package com.sportapi.services.Impl;
 
-import com.sportapi.model.LeaderBoard;
-import com.sportapi.repositories.LeaderBoardRepository;
+import com.sportapi.model.DTO.AddLeaderboardRecordsDTO;
+import com.sportapi.model.DTO.LeaderboardDTO;
+import com.sportapi.model.LeaderboardRecord;
+import com.sportapi.model.Teams;
+import com.sportapi.repositories.LeaderboardRecordRepository;
+import com.sportapi.repositories.TeamsRepository;
 import com.sportapi.services.LeaderBoardService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class LeaderBoardServiceImpl implements LeaderBoardService {
+    @Autowired
+    private LeaderboardRecordRepository leaderboardRecordRepository;
 
     @Autowired
-    private LeaderBoardRepository leaderBoardRepository;
+    private TeamsRepository teamsRepository;
 
-    @Override
-    public List<LeaderBoard> getLeaderBoards() {
-        // Use a custom query method with Sort parameter to fetch data in descending order of totalPoints
-        return leaderBoardRepository.findAll(Sort.by(Sort.Direction.DESC, "totalPoints"));
+    public List<LeaderboardDTO> getAllLeaderboardRecords() {
+        List<LeaderboardRecord> records = leaderboardRecordRepository.findAll();
+        return records.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
-    @Override
-    public LeaderBoard getLeaderBoardById(Long id) {
-        return leaderBoardRepository.findById(id).orElse(null);
+    public List<LeaderboardDTO> getLeaderboardByEvent(Long eventId) {
+        List<LeaderboardRecord> records = leaderboardRecordRepository.findByEventId(eventId);
+        return records.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
-    @Override
-    public LeaderBoard createLeaderBoard(LeaderBoard leaderBoard) {
-        // You may want to perform additional validation or business logic here
-        return leaderBoardRepository.save(leaderBoard);
+    public void addLeaderboardRecords(List<AddLeaderboardRecordsDTO> recordsDTO) {
+        List<LeaderboardRecord> records = recordsDTO.stream().map(this::convertToEntity).collect(Collectors.toList());
+        leaderboardRecordRepository.saveAll(records);
     }
 
-    @Override
-    public LeaderBoard updateLeaderBoard(Long id, LeaderBoard leaderBoard) {
-        if (leaderBoardRepository.existsById(id)) {
-            leaderBoard.setId(id);
-            return leaderBoardRepository.save(leaderBoard);
+    public void deleteLeaderboardRecord(Long id) {
+        leaderboardRecordRepository.deleteById(id);
+    }
+
+    public LeaderboardDTO updateLeaderboardRecord(Long id, AddLeaderboardRecordsDTO updateDTO) {
+        Optional<LeaderboardRecord> existingRecordOpt = leaderboardRecordRepository.findById(id);
+        if (existingRecordOpt.isPresent()) {
+            LeaderboardRecord existingRecord = existingRecordOpt.get();
+            existingRecord.setMatchesPlayed(updateDTO.getMatchesPlayed());
+            existingRecord.setMatchesWon(updateDTO.getMatchesWon());
+            existingRecord.setMatchesLost(updateDTO.getMatchesLost());
+            existingRecord.setTotalPoints(updateDTO.getTotalPoints());
+            leaderboardRecordRepository.save(existingRecord);
+            return convertToDTO(existingRecord);
         } else {
-            return null; // LeaderBoard with given id not found
+            throw new RuntimeException("Record not found with ID: " + id);
         }
     }
 
-    @Override
-    public boolean deleteLeaderBoard(Long id) {
-        if (leaderBoardRepository.existsById(id)) {
-            leaderBoardRepository.deleteById(id);
-            return true;
-        } else {
-            return false; // LeaderBoard with given id not found
-        }
+    private LeaderboardDTO convertToDTO(LeaderboardRecord record) {
+        Teams team = teamsRepository.findById(record.getTeamId()).orElseThrow();
+        LeaderboardDTO dto = new LeaderboardDTO();
+        dto.setEventId(record.getEventId());
+        dto.setTeamId(record.getTeamId());
+        dto.setTeamName(team.getTeamName());
+        dto.setMatchesPlayed(record.getMatchesPlayed());
+        dto.setMatchesWon(record.getMatchesWon());
+        dto.setMatchesLost(record.getMatchesLost());
+        dto.setTotalPoints(record.getTotalPoints());
+        return dto;
+    }
+
+    private LeaderboardRecord convertToEntity(AddLeaderboardRecordsDTO dto) {
+        return new LeaderboardRecord(dto.getEventId(), dto.getTeamId(), dto.getMatchesPlayed(), dto.getMatchesWon(), dto.getMatchesLost(), dto.getTotalPoints());
     }
 }

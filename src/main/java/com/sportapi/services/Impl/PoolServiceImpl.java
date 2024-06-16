@@ -6,9 +6,9 @@ import com.sportapi.model.Pool;
 import com.sportapi.model.Teams;
 import com.sportapi.repositories.PoolRepository;
 import com.sportapi.services.EventService;
-import com.sportapi.services.PoolRequest;
 import com.sportapi.services.PoolService;
 import com.sportapi.services.TeamsService;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,33 +53,33 @@ public class PoolServiceImpl implements PoolService {
         return poolRepository.save(pool);
     }
 
-
     @Override
-    public Pool createPool(PoolRequest poolRequest) {
-        return null;
-    }
-
-    @Override
+    @Transactional
     public List<Pool> getAllPools() {
         return poolRepository.findAll();
     }
 
     @Override
+    @Transactional
     public Pool getPoolById(Long poolId) {
-        return poolRepository.findById(poolId).orElse(null);
+        Pool pool = poolRepository.findById(poolId).orElse(null);
+        if (pool != null) {
+            Hibernate.initialize(pool.getTeams()); // Force initialization of the teams collection
+        }
+        return pool;
     }
 
     @Override
+    @Transactional
     public List<Teams> getTeamsForPool(Long poolId) {
         Pool pool = poolRepository.findById(poolId).orElse(null);
         if (pool != null) {
+            Hibernate.initialize(pool.getTeams()); // Force initialization of the teams collection
             return pool.getTeams();
         } else {
             return null;  // Handle pool not found
         }
     }
-
-
 
     @Override
     @Transactional
@@ -89,16 +89,13 @@ public class PoolServiceImpl implements PoolService {
             return null;  // Handle pool not found
         }
 
-        // Update pool properties
         existingPool.setPoolName(poolDTO.getPoolName());
 
-        // Assuming that you can also update the associated event
         Event event = eventService.getEventById(poolDTO.getEventId());
         if (event != null) {
             existingPool.setEvent(event);
         }
 
-        // Update the teams associated with the pool
         List<Teams> teams = poolDTO.getTeamIds().stream()
                 .map(teamId -> teamService.getTeamById(teamId))
                 .filter(team -> team != null)
@@ -109,40 +106,9 @@ public class PoolServiceImpl implements PoolService {
         return poolRepository.save(existingPool);
     }
 
-
     @Override
     @Transactional
     public void deletePool(Long poolId) {
         poolRepository.deleteById(poolId);
     }
-
-
-    // Other methods as needed
-
-//    @Override
-//    @Transactional
-//    public void addTeamToPool(Long poolId, Long teamId) {
-//        Pool pool = poolRepository.findById(poolId).orElse(null);
-//        Teams team = teamService.getTeamById(teamId);
-//
-//        if (pool != null && team != null) {
-//            pool.getTeams().add(team);
-//            poolRepository.save(pool);
-//        }
-//    }
-
-//    @Override
-//    @Transactional
-//    public void removeTeamFromPool(Long poolId, Long teamId) {
-//        Pool pool = poolRepository.findById(poolId).orElse(null);
-//
-//        if (pool != null) {
-//            pool.getTeams().removeIf(team -> team.getId().equals(teamId));
-//            poolRepository.save(pool);
-//        }
-//    }
-
-
-
-
 }

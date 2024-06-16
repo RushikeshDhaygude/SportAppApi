@@ -1,18 +1,23 @@
 package com.sportapi.services;
 
-import com.sportapi.model.LeaderBoard;
+import com.sportapi.model.DTO.AddLeaderboardRecordsDTO;
+import com.sportapi.model.DTO.LeaderboardDTO;
+import com.sportapi.model.LeaderboardRecord;
 
 import java.util.List;
 
 public interface LeaderBoardService {
+    
 
-    List<LeaderBoard> getLeaderBoards();
+    List<LeaderboardDTO> getAllLeaderboardRecords();
 
-    LeaderBoard getLeaderBoardById(Long id);
+    List<LeaderboardDTO> getLeaderboardByEvent(Long eventId);
 
-    LeaderBoard createLeaderBoard(LeaderBoard leaderBoard);
+    void addLeaderboardRecords(List<AddLeaderboardRecordsDTO> recordsDTO);
 
-    LeaderBoard updateLeaderBoard(Long id, LeaderBoard leaderBoard);
 
-    boolean deleteLeaderBoard(Long id);
+    void deleteLeaderboardRecord(Long id);
+
+
+    LeaderboardDTO updateLeaderboardRecord(Long id, AddLeaderboardRecordsDTO updateDTO);
 }
