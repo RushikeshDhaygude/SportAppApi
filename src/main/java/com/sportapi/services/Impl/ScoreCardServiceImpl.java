@@ -27,7 +27,6 @@ public class ScoreCardServiceImpl implements ScoreCardService {
 
     @Override
     public ScoreCard saveScoreCard(ScoreCard scoreCard) {
-        // Additional logic if needed
         return scoreCardRepository.save(scoreCard);
     }
 
@@ -35,4 +34,14 @@ public class ScoreCardServiceImpl implements ScoreCardService {
     public void deleteScoreCard(Long id) {
         scoreCardRepository.deleteById(id);
     }
+
+    public List<ScoreCard> getFinalScoreCards() {
+        return scoreCardRepository.findByStatus("FINAL");
+    }
+    public List<ScoreCard> getFinalScoreCardsByEventId(Long eventId) {
+        return scoreCardRepository.findByEventIdAndStatus(eventId, "FINAL");
+    }
+
+    // New method to get final results
+
 }

@@ -11,6 +11,7 @@ public interface EventService {
 
     Event getEventById(Long eventId);
 
+
     Event createEvent(Event event);
 
     Event updateEvent(Long eventId, Event updatedEvent);
