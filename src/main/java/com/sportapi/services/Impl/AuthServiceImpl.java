@@ -25,6 +25,9 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private OrganizationRepository organizationRepository;
 
+    @Value("${app.confirmation.link}")
+    private String confirmationLink;
+
     @Autowired
     private PendingRegistrationRepository pendingRegistrationRepository;
 
@@ -107,7 +110,7 @@ public class AuthServiceImpl implements AuthService {
         message.setTo(adminEmail);
         message.setSubject("Organization Registration Confirmation");
         message.setText("Please confirm the registration by clicking the following link: " +
-                "http://localhost:8080/auth/confirm?token=" + token);
+                confirmationLink + token);
         mailSender.send(message);
     }
 }
