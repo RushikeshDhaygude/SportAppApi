@@ -1,8 +1,13 @@
 package com.sportapi.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "organizations")
 public class Organization {
@@ -20,6 +25,9 @@ public class Organization {
     @Column(nullable = false)
     private String email;
 
+    @Column(nullable = false)
+    private String password;
+
     @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Event> events;
 
@@ -29,10 +37,11 @@ public class Organization {
         // Default constructor
     }
 
-    public Organization(String name, String contact, String email) {
+    public Organization(String name, String contact, String email, String password) {
         this.name = name;
         this.contact = contact;
         this.email = email;
+        this.password = password;
     }
 
     // Getters and setters for all fields
@@ -67,6 +76,14 @@ public class Organization {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public List<Event> getEvents() {
