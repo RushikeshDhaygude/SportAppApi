@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,6 +45,12 @@ public class LeaderboardServiceImpl implements LeaderboardService {
                 .orElse(new Leaderboard());
         leaderboard.setEvent(event);
 
+        if (leaderboard.getTeamScores() == null) {
+            leaderboard.setTeamScores(new ArrayList<>());
+        } else {
+            leaderboard.getTeamScores().clear();
+        }
+
         List<TeamScore> teamScores = leaderboardDto.getTeamScores().stream().map(dto -> {
             TeamScore teamScore = new TeamScore();
             teamScore.setTeamId(dto.getTeamId());
@@ -55,8 +62,6 @@ public class LeaderboardServiceImpl implements LeaderboardService {
             return teamScore;
         }).collect(Collectors.toList());
 
-        // Clear the existing team scores and add the new ones
-        leaderboard.getTeamScores().clear();
         leaderboard.getTeamScores().addAll(teamScores);
 
         return leaderboardRepository.save(leaderboard);

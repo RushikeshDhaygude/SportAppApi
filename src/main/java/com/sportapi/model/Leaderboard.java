@@ -1,8 +1,7 @@
 package com.sportapi.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import jakarta.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -17,10 +16,8 @@ public class Leaderboard {
     private Event event;
 
     @OneToMany(mappedBy = "leaderboard", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private List<TeamScore> teamScores;
+    private List<TeamScore> teamScores = new ArrayList<>();
 
-    // getters and setters
     public Long getId() {
         return id;
     }
