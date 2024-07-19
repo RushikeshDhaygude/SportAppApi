@@ -33,6 +33,8 @@ public class Event {
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     @JoinColumn(name = "organization_id", insertable = false, updatable = false)
+
+
     private Organization organization;
 
     // Constructors, getters, and setters
