@@ -20,8 +20,12 @@ public class Pool {
     @JoinColumn(name = "event_id")
     private Event event;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "pool_id")
+    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinTable(
+            name = "pool_teams",
+            joinColumns = @JoinColumn(name = "pool_id"),
+            inverseJoinColumns = @JoinColumn(name = "team_id")
+    )
     private List<Teams> teams;
 
 

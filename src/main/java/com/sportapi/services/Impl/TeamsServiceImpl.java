@@ -83,6 +83,7 @@ package com.sportapi.services.Impl;
 import com.sportapi.model.Event;
 import com.sportapi.model.Teams;
 import com.sportapi.repositories.TeamsRepository;
+import com.sportapi.config.CloudinaryService;
 import com.sportapi.services.EventService;
 import com.sportapi.services.TeamsService;
 import jakarta.persistence.EntityNotFoundException;
@@ -91,38 +92,44 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+
 @Service
 public class TeamsServiceImpl implements TeamsService {
 
     private final TeamsRepository teamsRepository;
-    private final FileUploadService fileUploadService;
-    private final EventService eventService; // Add this line to inject EventService
+    private final CloudinaryService cloudinaryService;
+    private final EventService eventService;
 
     @Autowired
-    public TeamsServiceImpl(TeamsRepository teamsRepository, FileUploadService fileUploadService, EventService eventService) {
+    public TeamsServiceImpl(TeamsRepository teamsRepository, CloudinaryService cloudinaryService, EventService eventService) {
         this.teamsRepository = teamsRepository;
-        this.fileUploadService = fileUploadService;
-        this.eventService = eventService; // Initialize EventService
+        this.cloudinaryService = cloudinaryService;
+        this.eventService = eventService;
     }
 
     @Override
     @Transactional
     public void createTeam(String teamName, MultipartFile teamLogo, String teamCaptain, String teamCaptainContact, Long eventId) {
-        Event event = eventService.getEventById(eventId); // Fetch the event by ID
+        Event event = eventService.getEventById(eventId);
         if (event == null) {
-            throw new EntityNotFoundException("Event not found with ID " + eventId); // Handle event not found
+            throw new EntityNotFoundException("Event not found with ID " + eventId);
         }
 
         Teams team = new Teams();
         team.setTeamName(teamName);
         team.setTeamCaptain(teamCaptain);
         team.setTeamCaptainContact(teamCaptainContact);
-        team.setEvent(event); // Set the event for the team
+        team.setEvent(event);
 
         if (teamLogo != null && !teamLogo.isEmpty()) {
-            String logoPath = fileUploadService.uploadFile(teamLogo, "images/team-logos");
-            team.setTeamLogoPath(logoPath);
+            try {
+                String logoPath = cloudinaryService.uploadFile(teamLogo);
+                team.setTeamLogoPath(logoPath);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to upload team logo", e);
+            }
         }
 
         teamsRepository.save(team);
@@ -134,19 +141,23 @@ public class TeamsServiceImpl implements TeamsService {
         Teams existingTeam = teamsRepository.findById(id).orElse(null);
 
         if (existingTeam != null) {
-            Event event = eventService.getEventById(eventId); // Fetch the event by ID
+            Event event = eventService.getEventById(eventId);
             if (event == null) {
-                throw new EntityNotFoundException("Event not found with ID " + eventId); // Handle event not found
+                throw new EntityNotFoundException("Event not found with ID " + eventId);
             }
 
             existingTeam.setTeamName(teamName);
             existingTeam.setTeamCaptain(teamCaptain);
             existingTeam.setTeamCaptainContact(teamCaptainContact);
-            existingTeam.setEvent(event); // Set the event for the team
+            existingTeam.setEvent(event);
 
             if (teamLogo != null && !teamLogo.isEmpty()) {
-                String logoPath = fileUploadService.uploadFile(teamLogo, "images/team-logos");
-                existingTeam.setTeamLogoPath(logoPath);
+                try {
+                    String logoPath = cloudinaryService.uploadFile(teamLogo);
+                    existingTeam.setTeamLogoPath(logoPath);
+                } catch (IOException e) {
+                    throw new RuntimeException("Failed to upload team logo", e);
+                }
             }
 
             teamsRepository.save(existingTeam);
@@ -158,6 +169,7 @@ public class TeamsServiceImpl implements TeamsService {
     public void deleteTeam(Long id) {
         teamsRepository.deleteById(id);
     }
+
     @Override
     public List<Teams> getAllTeams() {
         return teamsRepository.findAll();
@@ -167,5 +179,4 @@ public class TeamsServiceImpl implements TeamsService {
     public Teams getTeamById(Long id) {
         return teamsRepository.findById(id).orElse(null);
     }
-
 }

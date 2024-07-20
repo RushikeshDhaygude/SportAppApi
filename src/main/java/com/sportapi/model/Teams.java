@@ -84,6 +84,8 @@ package com.sportapi.model;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "teams")
 public class Teams {
@@ -108,6 +110,10 @@ public class Teams {
     @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 
+
+
+    @ManyToMany(mappedBy = "teams")
+    private List<Pool> pools;
     // Constructors, getters, and setters
 
     public Teams() {

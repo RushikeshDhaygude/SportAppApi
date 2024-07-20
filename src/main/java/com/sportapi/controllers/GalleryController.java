@@ -1,125 +1,195 @@
-package com.sportapi.controllers;// ... (imports)
+//package com.sportapi.controllers;
+//
+//import com.cloudinary.Cloudinary;
+//import com.cloudinary.utils.ObjectUtils;
+//import com.sportapi.model.Gallery;
+//import com.sportapi.model.Organization;
+//import com.sportapi.repositories.GalleryRepository;
+//import com.sportapi.repositories.OrganizationRepository;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.web.bind.annotation.*;
+//import org.springframework.web.multipart.MultipartFile;
+//
+//import java.io.IOException;
+//import java.util.Map;
+//
+//@RestController
+//@RequestMapping("api/galleries")
+//public class GalleryController {
+//
+//    @Autowired
+//    private GalleryRepository galleryRepository;
+//
+//    @Autowired
+//    private OrganizationRepository organizationRepository;
+//
+//    @Autowired
+//    private Cloudinary cloudinary;
+//
+//    @PostMapping
+//    public Gallery uploadImage(@RequestParam("organizationId") Long organizationId,
+//                               @RequestParam("file") MultipartFile file) throws IOException {
+//        // Find the organization
+//        Organization organization = organizationRepository.findById(organizationId)
+//                .orElseThrow(() -> new RuntimeException("Organization not found"));
+//
+//        // Upload the image to Cloudinary
+//        Map<String, String> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+//
+//        // Get image details
+//        String imagePath = uploadResult.get("secure_url");
+//        String imageName = uploadResult.get("public_id"); // Cloudinary's public ID
+//
+//        // Create Gallery object
+//        Gallery gallery = new Gallery();
+//        gallery.setOrganization(organization);
+//        gallery.setImagePath(imagePath);
+//        gallery.setImageName(imageName);
+//
+//        return galleryRepository.save(gallery);
+//    }
+//
+//    @PutMapping("/{id}")
+//    public Gallery updateImage(@PathVariable Long id,
+//                               @RequestParam("file") MultipartFile file) throws IOException {
+//        // Find the gallery entry
+//        Gallery gallery = galleryRepository.findById(id)
+//                .orElseThrow(() -> new RuntimeException("Gallery not found"));
+//
+//        // Upload the new image to Cloudinary
+//        Map<String, String> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+//
+//        // Update image details
+//        gallery.setImagePath(uploadResult.get("secure_url")); // New image URL
+//        gallery.setImageName(uploadResult.get("public_id")); // New image name
+//
+//        return galleryRepository.save(gallery);
+//    }
+//
+//    @GetMapping("/{id}")
+//    public Gallery getImage(@PathVariable Long id) {
+//        return galleryRepository.findById(id)
+//                .orElseThrow(() -> new RuntimeException("Gallery not found"));
+//    }
+//
+//    @GetMapping
+//    public Iterable<Gallery> getAllImages() {
+//        return galleryRepository.findAll();
+//    }
+//
+//    @DeleteMapping("/{id}")
+//    public void deleteImage(@PathVariable Long id) throws IOException {
+//        // Find the gallery entry
+//        Gallery gallery = galleryRepository.findById(id)
+//                .orElseThrow(() -> new RuntimeException("Gallery not found"));
+//
+//        // Extract public ID from the image name
+//        String publicId = gallery.getImageName();
+//
+//        // Delete the image from Cloudinary
+//        cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+//
+//        // Delete the gallery entry from the database
+//        galleryRepository.delete(gallery);
+//    }
+//}
+package com.sportapi.controllers;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.sportapi.model.Gallery;
 import com.sportapi.model.Organization;
-import com.sportapi.services.GalleryService;
-import com.sportapi.services.Impl.FileUploadService;
-import com.sportapi.services.OrganizationService;
+import com.sportapi.repositories.GalleryRepository;
+import com.sportapi.repositories.OrganizationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-// ... (imports)
+import java.io.IOException;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/galleries")
+@RequestMapping("api/galleries")
 public class GalleryController {
 
-    private final GalleryService galleryService;
-    private final FileUploadService fileUploadService;
-    private final OrganizationService organizationService;
+    @Autowired
+    private GalleryRepository galleryRepository;
 
     @Autowired
-    public GalleryController(
-            GalleryService galleryService,
-            FileUploadService fileUploadService,
-            OrganizationService organizationService) {
-        this.galleryService = galleryService;
-        this.fileUploadService = fileUploadService;
-        this.organizationService = organizationService;
-    }
+    private OrganizationRepository organizationRepository;
 
-    @GetMapping
-    public ResponseEntity<List<Gallery>> getAllGalleries() {
-        List<Gallery> galleries = galleryService.getAllGalleries();
-        return new ResponseEntity<>(galleries, HttpStatus.OK);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Gallery> getGalleryById(@PathVariable Long id) {
-        Gallery gallery = galleryService.getGalleryById(id);
-        if (gallery != null) {
-            return new ResponseEntity<>(gallery, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
-    // ... (other methods)
+    @Autowired
+    private Cloudinary cloudinary;
 
     @PostMapping
-    public ResponseEntity<Gallery> createGallery(
-            @RequestParam("organizationId") Long organizationId,
-            @RequestPart("file") MultipartFile file) {
+    public Gallery uploadImage(@RequestParam("organizationId") Long organizationId,
+                               @RequestParam("file") MultipartFile file) throws IOException {
+        // Find the organization
+        Organization organization = organizationRepository.findById(organizationId)
+                .orElseThrow(() -> new RuntimeException("Organization not found"));
 
-        Organization organization = organizationService.getOrganizationById(organizationId);
+        // Upload the image to Cloudinary
+        Map<String, String> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
 
-        if (organization == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        // Get image details
+        String imagePath = uploadResult.get("secure_url");
+        String imageName = uploadResult.get("public_id"); // Cloudinary's public ID
 
+        // Create Gallery object
         Gallery gallery = new Gallery();
         gallery.setOrganization(organization);
+        gallery.setImagePath(imagePath);
+        gallery.setImageName(imageName);
 
-        try {
-            String imagePath = fileUploadService.uploadFile(file, "images/galleries");
-            gallery.setImagePath(imagePath);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        Gallery createdGallery = galleryService.createGallery(gallery);
-
-        return new ResponseEntity<>(createdGallery, HttpStatus.CREATED);
+        return galleryRepository.save(gallery);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Gallery> updateGallery(
-            @PathVariable Long id,
-            @RequestParam("organizationId") Long organizationId,
-            @RequestPart(value = "file", required = false) MultipartFile file) {
+    public Gallery updateImage(@PathVariable Long id,
+                               @RequestParam("file") MultipartFile file) throws IOException {
+        // Find the gallery entry
+        Gallery gallery = galleryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Gallery not found"));
 
-        Organization organization = organizationService.getOrganizationById(organizationId);
+        // Upload the new image to Cloudinary
+        Map<String, String> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
 
-        if (organization == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        // Update image details
+        gallery.setImagePath(uploadResult.get("secure_url")); // New image URL
+        gallery.setImageName(uploadResult.get("public_id")); // New image name
 
-        Gallery existingGallery = galleryService.getGalleryById(id);
+        return galleryRepository.save(gallery);
+    }
 
-        if (existingGallery != null) {
-            // Update the existing gallery properties
-            existingGallery.setOrganization(organization);
+    @GetMapping("/{id}")
+    public Gallery getImage(@PathVariable Long id) {
+        return galleryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Gallery not found"));
+    }
 
-            if (file != null && !file.isEmpty()) {
-                try {
-                    String imagePath = fileUploadService.uploadFile(file, "images/galleries");
-                    existingGallery.setImagePath(imagePath);
-                } catch (Exception e) {
-                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-                }
-            }
+    @GetMapping
+    public Iterable<Gallery> getAllImages() {
+        return galleryRepository.findAll();
+    }
 
-            // Save the updated gallery
-            Gallery updatedGalleryResult = galleryService.updateGallery(existingGallery);
-
-            return new ResponseEntity<>(updatedGalleryResult, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    @GetMapping("/organization/{organizationId}")
+    public Iterable<Gallery> getImagesByOrganizationId(@PathVariable Long organizationId) {
+        return galleryRepository.findByOrganizationId(organizationId);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteGallery(@PathVariable Long id) {
-        if (galleryService.deleteGallery(id)) {
-            return new ResponseEntity<>("Gallery deleted successfully", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Gallery not found", HttpStatus.NOT_FOUND);
-        }
-    }
+    public void deleteImage(@PathVariable Long id) throws IOException {
+        // Find the gallery entry
+        Gallery gallery = galleryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Gallery not found"));
 
-    // ... (other methods)
+        // Extract public ID from the image name
+        String publicId = gallery.getImageName();
+
+        // Delete the image from Cloudinary
+        cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+
+        // Delete the gallery entry from the database
+        galleryRepository.delete(gallery);
+    }
 }
