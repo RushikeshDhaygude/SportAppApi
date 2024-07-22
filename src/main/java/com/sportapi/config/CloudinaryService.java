@@ -39,7 +39,7 @@ public class CloudinaryService {
 
         // Upload video
         Map<String, Object> uploadResult = cloudinary.uploader().upload(file.getBytes(),
-                ObjectUtils.asMap("resource_type", "video"));
+                ObjectUtils.asMap("resource_type", "video","secure", true));
         logger.info("Upload result: {}", uploadResult);
         return uploadResult;
     }
