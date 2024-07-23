@@ -82,12 +82,10 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
-import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -96,33 +94,26 @@ import java.util.Map;
 @Configuration
 public class KafkaConfig {
 
+    private static final String BOOTSTRAP_SERVERS = "kafka-3ed35f68-rdopt9414-73ee.e.aivencloud.com:21878";
+    private static final String GROUP_ID = "scorecard-group";
+    private static final String TRUSTSTORE_PASSWORD = "Rushi@9414";
+    private static final String KEYSTORE_PASSWORD = "Rushi@9414";
+    private static final String KEY_PASSWORD = "Rushi@9414";
+    private static final String TRUSTSTORE_PATH = "client.truststore.jks";
+    private static final String KEYSTORE_PATH = "client.keystore.p12";
 
     @Bean
     public ProducerFactory<String, Object> producerFactory() throws IOException {
         Map<String, Object> configProps = new HashMap<>();
-        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka-3ed35f68-rdopt9414-73ee.e.aivencloud.com:21878");
+        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-
-        ClassPathResource truststoreResource = new ClassPathResource("client.truststore.jks");
-        File truststoreFile = truststoreResource.getFile();
-
-
-        // Load the keystore file from classpath
-        ClassPathResource keystoreResource = new ClassPathResource("client.keystore.p12");
-        File keystoreFile = keystoreResource.getFile();
-
-        // SSL Configuration
+        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class); // Use JsonSerializer for value
         configProps.put("security.protocol", "SSL");
-        configProps.put("ssl.truststore.location",  truststoreFile.getAbsolutePath());
-        configProps.put("ssl.truststore.password", "Rushi@9414");
-        configProps.put("ssl.keystore.location", keystoreFile.getAbsolutePath());
-        configProps.put("ssl.keystore.password", "Rushi@9414");
-        configProps.put("ssl.key.password", "Rushi@9414");
-
-        // SASL Configuration
-//        configProps.put("sasl.mechanism", "PLAIN");
-//        configProps.put("sasl.jaas.config", "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"rdopt9414@gmail.com\" password=\"Rushi@9414\";");
+        configProps.put("ssl.truststore.location", new ClassPathResource(TRUSTSTORE_PATH).getFile().getAbsolutePath());
+        configProps.put("ssl.keystore.location", new ClassPathResource(KEYSTORE_PATH).getFile().getAbsolutePath());
+        configProps.put("ssl.truststore.password", TRUSTSTORE_PASSWORD);
+        configProps.put("ssl.keystore.password", KEYSTORE_PASSWORD);
+        configProps.put("ssl.key.password", KEY_PASSWORD);
 
         return new DefaultKafkaProducerFactory<>(configProps);
     }
@@ -135,39 +126,22 @@ public class KafkaConfig {
     @Bean
     public ConsumerFactory<String, Object> consumerFactory() throws IOException {
         Map<String, Object> configProps = new HashMap<>();
-        configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka-3ed35f68-rdopt9414-73ee.e.aivencloud.com:21878");
-        configProps.put(ConsumerConfig.GROUP_ID_CONFIG, "scorecard-group");
+        configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
+        configProps.put(ConsumerConfig.GROUP_ID_CONFIG, GROUP_ID);
         configProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
-        ClassPathResource truststoreResource = new ClassPathResource("client.truststore.jks");
-        File truststoreFile = truststoreResource.getFile();
-
-
-        // Load the keystore file from classpath
-        ClassPathResource keystoreResource = new ClassPathResource("client.keystore.p12");
-        File keystoreFile = keystoreResource.getFile();
-
-
-
-        // SSL Configuration
         configProps.put("security.protocol", "SSL");
-        configProps.put("ssl.truststore.location",  truststoreFile.getAbsolutePath());
-        configProps.put("ssl.truststore.password", "Rushi@9414");
-        configProps.put("ssl.keystore.location",  keystoreFile.getAbsolutePath());
-        configProps.put("ssl.keystore.password", "Rushi@9414");
-        configProps.put("ssl.key.password", "Rushi@9414");
+        configProps.put("ssl.truststore.location", new ClassPathResource(TRUSTSTORE_PATH).getFile().getAbsolutePath());
+        configProps.put("ssl.truststore.password", TRUSTSTORE_PASSWORD);
+        configProps.put("ssl.keystore.location", new ClassPathResource(KEYSTORE_PATH).getFile().getAbsolutePath());
+        configProps.put("ssl.keystore.password", KEYSTORE_PASSWORD);
+        configProps.put("ssl.key.password", KEY_PASSWORD);
 
-        // SASL Configuration
-//        configProps.put("sasl.mechanism", "PLAIN");
-//        configProps.put("sasl.jaas.config", "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"rdopt9414@gmail.com\" password=\"Rushi@9414\";");
-
-        // Error Handling Deserializer
         configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class.getName());
         configProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class.getName());
         configProps.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class.getName());
         configProps.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, StringDeserializer.class.getName());
 
-        // Json Deserializer Settings
         configProps.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "com.sportapi.model.ScoreCard");
         configProps.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
 
