@@ -441,7 +441,7 @@ public class ScoreCardController {
     }
 
     @Transactional
-    private ScoreCardResponse convertToDTO(ScoreCard scoreCard) {
+    protected ScoreCardResponse convertToDTO(ScoreCard scoreCard) {
         ScoreCardResponse dto = new ScoreCardResponse();
         dto.setId(scoreCard.getId());
 
