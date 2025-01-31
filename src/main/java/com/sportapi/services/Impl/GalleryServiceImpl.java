@@ -1,4 +1,4 @@
-package com.sportapi.services.impl;
+package com.sportapi.services.Impl;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
